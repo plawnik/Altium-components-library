@@ -60,6 +60,18 @@ For cross-platform cleanup, or when a newly compiled `IntLib` must first be coll
 python scripts/update_repository.py
 ```
 
+## Troubleshooting
+
+Problems are listed as independent items so additional cases can be added later using the same **symptom → cause → solution → prevention** structure.
+
+- **`git pull` reports `Unlink of file 'compiled/IC.IntLib' failed`**
+  - **Symptom:** Git displays `Should I try again? (y/n)` while updating a compiled library on Windows.
+  - **Cause:** Windows does not allow Git to replace a file that is open in another process. Altium Designer commonly keeps an installed `IntLib` open even after its project has been closed. File Explorer, antivirus software, or another indexing process may also temporarily hold the file.
+  - **Immediate solution:** Leave the Git question open, completely close Altium Designer, return to the terminal, and answer `y`. Closing only the Altium project may not release the library; exit the entire application.
+  - **If the pull was cancelled:** Close Altium Designer, run `git status`, and then retry with `git pull --ff-only`. If Git reports any other local changes or conflict, inspect them before running further commands.
+  - **Finding another locking process:** Open Windows Resource Monitor with `resmon.exe`, go to **CPU → Associated Handles**, search for `IC.IntLib`, and close the application holding the handle. Do not force-delete the file while it is in use.
+  - **Prevention:** Do not install an `IntLib` in Altium directly from the repository's `compiled/` directory. Extract the latest Release into a separate location such as `C:\AltiumLibraries\`, install the libraries from there, and leave the repository copy free for Git to update.
+
 ## Component Categories
 
 | Category | Contents |
