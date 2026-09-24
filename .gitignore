@@ -1,0 +1,26 @@
+# Altium local history, previews and transient editor files
+History/
+__Previews/
+*.DsnWrk
+*.PrjPcbStructure
+*.LOG
+*.log
+*.bak
+*.tmp
+*.~*
+
+# Python local files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# OS/editor clutter
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# IMPORTANT: do not ignore "Project Outputs for ...".  Generated IntLib files
+# must reach GitHub Actions so the workflow can move and commit them.

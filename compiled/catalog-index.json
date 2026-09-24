@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "description": "Generated mapping used to preserve the source category of each flat IntLib file.",
+  "libraries": {
+    "IC.IntLib": "IC"
+  }
+}

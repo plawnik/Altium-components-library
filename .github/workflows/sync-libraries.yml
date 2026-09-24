@@ -1,0 +1,135 @@
+name: Sync Altium libraries and catalog
+
+"on":
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: altium-library-sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  synchronize:
+    if: github.actor != 'github-actions[bot]' && startsWith(github.ref, 'refs/heads/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Fast-forward to current branch head
+        shell: bash
+        run: git pull --ff-only origin "$GITHUB_REF_NAME"
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install parser dependency
+        run: python -m pip install --requirement requirements.txt
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Collect IntLib files and rebuild README catalog
+        run: python scripts/update_repository.py
+
+      - name: Check generated text files
+        run: git diff --check
+
+      - name: Commit generated changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all -- README.md compiled source
+
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+
+          git commit -m "chore(libraries): sync IntLib files and catalog [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Build compiled library package
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZIP_DEFLATED, ZipFile
+
+          compiled_directory = Path("compiled")
+          libraries = sorted(
+              path
+              for path in compiled_directory.rglob("*")
+              if path.is_file() and path.suffix.casefold() == ".intlib"
+          )
+          if not libraries:
+              raise SystemExit("No compiled .IntLib libraries were found; release was not created.")
+
+          archive = Path("release/Altium-components-library.zip")
+          archive.parent.mkdir(parents=True, exist_ok=True)
+          with ZipFile(archive, "w", compression=ZIP_DEFLATED, compresslevel=9) as output:
+              for library in libraries:
+                  output.write(library, library.relative_to(compiled_directory))
+
+          print(f"Created {archive} containing {len(libraries)} IntLib file(s).")
+          PY
+
+      - name: Publish GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: libraries-${{ github.run_number }}
+          RELEASE_TITLE: Compiled libraries - build ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          release_sha="$(git rev-parse HEAD)"
+          archive="release/Altium-components-library.zip"
+
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "$archive" \
+              --clobber \
+              --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$RELEASE_TAG" "$archive" \
+              --latest \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$release_sha" \
+              --title "$RELEASE_TITLE" \
+              --notes "Automatically generated from commit $release_sha. The ZIP contains all compiled IntLib files from the compiled directory."
+          fi
+
+      - name: Remove older automated releases
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CURRENT_RELEASE_TAG: libraries-${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          gh release list \
+            --repo "$GITHUB_REPOSITORY" \
+            --limit 100 \
+            --json tagName \
+            --jq '.[].tagName' |
+          while IFS= read -r release_tag; do
+            if [[ "$release_tag" == libraries-* && "$release_tag" != "$CURRENT_RELEASE_TAG" ]]; then
+              gh release delete "$release_tag" \
+                --cleanup-tag \
+                --yes \
+                --repo "$GITHUB_REPOSITORY"
+            fi
+          done

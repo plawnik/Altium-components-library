@@ -1,0 +1,164 @@
+{
+  "catalog_aliases": {
+    "manufacturer_part_number": [
+      "Part Number 1",
+      "Part Number",
+      "Manufacturer Part Number",
+      "Manufacturer Part #",
+      "Mfr Part Number",
+      "Mfr. Part Number",
+      "MPN"
+    ],
+    "manufacturer": [
+      "Manufacturer 1",
+      "Manufacturer",
+      "Manufacturer Name",
+      "Mfr",
+      "MFN"
+    ],
+    "package": [
+      "Package",
+      "Package / Case",
+      "Case/Package",
+      "Case Package",
+      "Housing"
+    ]
+  },
+  "base_parameters": {
+    "required": [
+      "Value",
+      "Manufacturer 1",
+      "Part Number 1",
+      "Package"
+    ],
+    "recommended": [
+      "Description",
+      "Datasheet",
+      "Lifecycle Status",
+      "RoHS",
+      "REACH",
+      "Mounting Type",
+      "Operating Temperature",
+      "Library Revision",
+      "Verified By",
+      "Verified Date"
+    ]
+  },
+  "category_parameters": {
+    "CAPACITORS": [
+      "Tolerance",
+      "Voltage Rating",
+      "Dielectric",
+      "Temperature Coefficient",
+      "ESR",
+      "Ripple Current",
+      "Polarity"
+    ],
+    "CONNECTORS": [
+      "Series",
+      "Positions",
+      "Rows",
+      "Pitch",
+      "Gender",
+      "Orientation",
+      "Mounting Type",
+      "Current Rating",
+      "Voltage Rating"
+    ],
+    "CRYSTALS_OSCILLATORS": [
+      "Frequency",
+      "Frequency Tolerance",
+      "Frequency Stability",
+      "Load Capacitance",
+      "Supply Voltage",
+      "Output Type"
+    ],
+    "DIODES": [
+      "Type",
+      "Reverse Voltage",
+      "Forward Current",
+      "Forward Voltage",
+      "Recovery Time"
+    ],
+    "ELECTROMECHANICAL": [
+      "Type",
+      "Coil Voltage",
+      "Contact Rating",
+      "Actuation",
+      "Positions",
+      "Mechanical Life"
+    ],
+    "FERRITES": [
+      "Impedance",
+      "Test Frequency",
+      "Current Rating",
+      "DCR"
+    ],
+    "IC": [
+      "Function",
+      "Supply Voltage",
+      "Interface",
+      "Channels",
+      "Operating Temperature"
+    ],
+    "INDUCTORS": [
+      "Tolerance",
+      "Current Rating",
+      "Saturation Current",
+      "DCR",
+      "SRF",
+      "Shielding"
+    ],
+    "MISC": [
+      "Type",
+      "Notes"
+    ],
+    "MODULES": [
+      "Function",
+      "Supply Voltage",
+      "Interface",
+      "RF Band",
+      "Form Factor"
+    ],
+    "OPTOELECTRONICS": [
+      "Type",
+      "Color",
+      "Wavelength",
+      "Forward Voltage",
+      "Forward Current",
+      "Luminous Intensity",
+      "Viewing Angle"
+    ],
+    "PROTECTION": [
+      "Type",
+      "Working Voltage",
+      "Breakdown Voltage",
+      "Clamping Voltage",
+      "Peak Pulse Current",
+      "Capacitance"
+    ],
+    "RESISTORS": [
+      "Tolerance",
+      "Power Rating",
+      "TCR",
+      "Technology",
+      "Working Voltage"
+    ],
+    "TRANSFORMERS": [
+      "Turns Ratio",
+      "Isolation Voltage",
+      "Inductance",
+      "Power Rating",
+      "Frequency Range"
+    ],
+    "TRANSISTORS": [
+      "Type",
+      "Polarity",
+      "VDS/VCE",
+      "ID/IC",
+      "RDS(on)",
+      "VGS(th)",
+      "Power Rating"
+    ]
+  }
+}
