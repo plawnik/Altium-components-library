@@ -17,7 +17,7 @@ A new numbered GitHub Release is created automatically after every push to `main
 
 After pulling a newer repository revision, reopen or refresh the library in Altium Designer if the updated components are not immediately visible.
 
-## Library Layer Convention
+## Library Layer Convention <-- NOT VALID;TODO
 
 The table below is an example structure only. Replace the layer numbers, names, colors, and descriptions with the actual library convention used in this repository.
 
