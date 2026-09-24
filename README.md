@@ -32,18 +32,29 @@ The table below is an example structure only. Replace the layer numbers, names, 
 
 ## Adding a New Component
 
-Each category may contain a reusable schematic component named `**TEMPLATE**`. It is the fastest way to create a component with all category parameters already present: duplicate the template in Altium Designer, rename the copied component, and replace every placeholder with real data. Keep the original template's **Library Reference** exactly `**TEMPLATE**`. The generator deliberately excludes it from the README tables, component totals, and metadata warnings.
+Each category may contain two reusable entries named `**TEMPLATE**`: a schematic component in `SchLib` and a footprint in `PcbLib`. They are the fastest way to create a component without rebuilding its parameters and PCB-layer structure manually. Duplicate both templates, rename only the copies, and replace their placeholders and geometry with real component data. Keep the original schematic template's **Library Reference** and the original footprint's name exactly `**TEMPLATE**`. Templates are deliberately excluded from the README tables and component totals.
 
 1. Select the appropriate category under `source/`. Create a new category only when none of the existing categories is suitable.
-2. Open the category `SchLib`, duplicate `**TEMPLATE**`, and immediately give the copy its real Library Reference. If that category does not have a template yet, create one containing all parameters listed for the category below and retain it for future components.
-3. Create or select the matching footprint in the category `PcbLib`, then assign it to the new schematic component.
-4. Replace all template placeholders. Use the exact parameter names defined in the tables below. Check the symbol pins, PCB pads, footprint dimensions, polarity, pin-1 marking, and 3D model against the manufacturer documentation.
+2. Open the category `SchLib`, duplicate `**TEMPLATE**`, and immediately give the copy its real Library Reference. The schematic template contains the category parameter fields listed below; do not modify the original template.
+3. Open the category `PcbLib`, duplicate its `**TEMPLATE**` footprint, and immediately give the copy its real footprint name. Preserve the predefined layer structure and layer assignments from the template while replacing the example geometry with the real pads, outlines, markings, clearances, and 3D model. Do not modify the original footprint template.
+4. Assign the copied footprint to the new schematic component and replace all remaining template placeholders. Use the exact parameter names defined in the tables below. Check the symbol pins, PCB pads, footprint dimensions, polarity, pin-1 marking, layer usage, and 3D model against the manufacturer documentation.
 5. Use `Manufacturer 1` and `Part Number 1` for the primary approved component. Use `Manufacturer 2` and `Part Number 2` only for an approved alternative with the same electrical and mechanical requirements.
 6. Compile the `LibPkg` in Altium Designer and leave the generated `IntLib` in the default `Project Outputs for ...` directory.
 7. Commit and push the source files together with the generated output directory. The repository workflow will move the compiled library to `compiled/`, remove the complete generated output directory and any tracked `History` directory, and update the component list at the end of this README.
 8. Pull the workflow commit before making the next library change.
 
-GitHub Actions can clean the repository, but it cannot delete ignored directories from your local disk. To remove every local `History` and `Project Outputs for ...` directory after collecting its `IntLib`, install the parser dependency with `python -m pip install -r requirements.txt` and run:
+### Cleaning Local Generated Folders
+
+GitHub Actions can clean the repository, but it cannot delete ignored or untracked directories from your local disk. On Windows, after the workflow has completed and you have pulled its changes, double-click **`Cleanup Source.bat`** in the repository root.
+
+The cleanup utility recursively scans only `source/` and removes:
+
+- every directory named `History`;
+- every directory whose name starts with `Project Outputs for `.
+
+The command window remains open and shows every removed directory. As a safeguard, a `Project Outputs for ...` directory containing an `IntLib` is removed only when an identically named and byte-identical library already exists in `compiled/`. Unsynchronized output is retained and reported instead of being deleted. The utility requires only the Windows PowerShell included with Windows; the batch file runs `scripts/cleanup_source.ps1` internally.
+
+For cross-platform cleanup, or when a newly compiled `IntLib` must first be collected into `compiled/`, install the parser dependency with `python -m pip install -r requirements.txt` and run:
 
 ```bash
 python scripts/update_repository.py

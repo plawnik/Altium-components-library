@@ -5,9 +5,11 @@
 
 # LibPkg is an INI-like project file and remains reviewable in Git.
 *.LibPkg text eol=crlf
+*.bat text eol=crlf
 
 # Repository-owned text files use LF on every platform.
 *.py text eol=lf
+*.ps1 text eol=lf
 *.json text eol=lf
 *.md text eol=lf
 *.yml text eol=lf
