@@ -1,12 +1,21 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]
     [string]$RepositoryRoot
 )
 
 $ErrorActionPreference = "Stop"
 
-$repository = [System.IO.Path]::GetFullPath($RepositoryRoot)
+if ([string]::IsNullOrWhiteSpace($RepositoryRoot)) {
+    $RepositoryRoot = Split-Path -Parent $PSScriptRoot
+}
+
+$cleanRepositoryRoot = $RepositoryRoot.Trim().Trim([char]34)
+if ([string]::IsNullOrWhiteSpace($cleanRepositoryRoot)) {
+    Write-Host "[ERROR] Repository path is empty." -ForegroundColor Red
+    exit 1
+}
+
+$repository = [System.IO.Path]::GetFullPath($cleanRepositoryRoot)
 $sourceRoot = Join-Path $repository "source"
 $compiledRoot = Join-Path $repository "compiled"
 

@@ -17,7 +17,7 @@ echo Altium source cleanup
 echo Repository: %CD%
 echo.
 
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\cleanup_source.ps1" -RepositoryRoot "%~dp0"
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\cleanup_source.ps1"
 set "CLEANUP_RESULT=%ERRORLEVEL%"
 
 echo.
