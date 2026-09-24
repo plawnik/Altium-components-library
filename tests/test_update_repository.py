@@ -84,6 +84,37 @@ class PipeRecordTests(unittest.TestCase):
         self.assertEqual(len(parsed), 1)
         self.assertEqual(parsed[0].manufacturer_part_number, "ABC-123")
 
+    def test_compiled_parameter_blob_ignores_reusable_template(self) -> None:
+        template = (
+            b"Library Reference=**TEMPLATE**|Manufacturer 1=*|"
+            b"Part Number 1=*|Package=*\x00"
+        )
+        component = (
+            b"Library Reference=RP2354B|Manufacturer 1=Raspberry Pi|"
+            b"Part Number 1=RP2354B|Package=QFN80 (10x10mm)\x00"
+        )
+        blob = (
+            struct.pack("<I", len(template))
+            + template
+            + struct.pack("<I", len(component))
+            + component
+        )
+        aliases = {
+            "manufacturer_part_number": ["Part Number 1"],
+            "manufacturer": ["Manufacturer 1"],
+            "package": ["Package"],
+        }
+
+        parsed = updater.parse_parameter_blob(
+            blob,
+            category="IC",
+            intlib=Path("compiled/IC.IntLib"),
+            aliases=aliases,
+        )
+
+        self.assertEqual(len(parsed), 1)
+        self.assertEqual(parsed[0].symbol, "RP2354B")
+
     def test_intlib_stream_compression_markers(self) -> None:
         payload = b"compiled-parameters"
         source = Path("TEST.IntLib")
@@ -117,6 +148,7 @@ class IntLibSynchronizationTests(unittest.TestCase):
             self.assertFalse(output.exists())
             self.assertEqual(result.intlibs_changed, 1)
             self.assertEqual(result.output_directories, 1)
+            self.assertEqual(result.history_directories, 0)
             self.assertEqual(result.intlib_categories["IC.IntLib"], "IC")
             manifest = (compiled / updater.MANIFEST_FILENAME).read_text(encoding="utf-8")
             self.assertIn('"IC.IntLib": "IC"', manifest)
@@ -139,6 +171,29 @@ class IntLibSynchronizationTests(unittest.TestCase):
             self.assertTrue(first.exists())
             self.assertTrue(second.exists())
             self.assertFalse(compiled.exists())
+
+    def test_removes_history_without_importing_stale_outputs_from_it(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / "source"
+            compiled = root / "compiled"
+            stale_output = (
+                source
+                / "IC"
+                / "History"
+                / "Revision 1"
+                / "Project Outputs for IC"
+            )
+            stale_output.mkdir(parents=True)
+            (stale_output / "IC.IntLib").write_bytes(b"stale-library")
+
+            result = updater.sync_intlibs(source, compiled)
+
+            self.assertFalse((source / "IC" / "History").exists())
+            self.assertFalse((compiled / "IC.IntLib").exists())
+            self.assertEqual(result.output_directories, 0)
+            self.assertEqual(result.history_directories, 1)
+            self.assertEqual(result.intlibs_found, 0)
 
 
 class ReadmeTests(unittest.TestCase):

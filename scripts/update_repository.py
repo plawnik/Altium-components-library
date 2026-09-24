@@ -4,12 +4,13 @@
 The compiled ``IntLib`` is the catalog's source of truth.  Working ``SchLib``
 files are deliberately ignored when component rows are generated.
 
-The script performs four operations:
+The script performs five operations:
 
 1. finds ``Project Outputs for ...`` directories below ``source/``;
 2. copies their ``*.IntLib`` files into the flat ``compiled/`` directory;
 3. records the source category of every IntLib and removes generated outputs;
-4. reads compiled component parameters from ``compiled/*.IntLib`` and replaces
+4. removes Altium ``History`` directories below ``source/``;
+5. reads compiled component parameters from ``compiled/*.IntLib`` and replaces
    only the marked catalog block at the end of README.md.
 
 No Altium installation is required.  Paths are resolved relative to the
@@ -43,6 +44,8 @@ except ImportError as exc:  # pragma: no cover - exercised only without setup
 CATALOG_START = "<!-- ALTIUM-CATALOG:START -->"
 CATALOG_END = "<!-- ALTIUM-CATALOG:END -->"
 OUTPUT_DIRECTORY_PREFIX = "project outputs for "
+HISTORY_DIRECTORY_NAME = "history"
+TEMPLATE_COMPONENT_NAME = "template"
 MANIFEST_FILENAME = "catalog-index.json"
 MANIFEST_VERSION = 1
 UNKNOWN_CATEGORY = "UNCATEGORIZED"
@@ -72,6 +75,7 @@ class IntLibCandidate:
 @dataclass(frozen=True)
 class SyncResult:
     output_directories: int
+    history_directories: int
     intlibs_found: int
     intlibs_changed: int
     intlibs_unchanged: int
@@ -91,19 +95,43 @@ def is_output_directory(path: Path) -> bool:
     return path.name.casefold().startswith(OUTPUT_DIRECTORY_PREFIX)
 
 
-def find_output_directories(source_root: Path) -> list[Path]:
-    matches = [
-        path
-        for path in source_root.rglob("*")
-        if path.is_dir() and is_output_directory(path)
-    ]
-    # Ignore nested matches if an unusual generated tree contains another
-    # directory with the same prefix.
+def is_history_directory(path: Path) -> bool:
+    return path.name.casefold() == HISTORY_DIRECTORY_NAME
+
+
+def is_inside_history_directory(path: Path, source_root: Path) -> bool:
+    relative = path.relative_to(source_root)
+    return any(part.casefold() == HISTORY_DIRECTORY_NAME for part in relative.parts[:-1])
+
+
+def top_level_directories(paths: Iterable[Path]) -> list[Path]:
+    """Return deterministic matches without descendants of another match."""
+
     top_level: list[Path] = []
-    for candidate in sorted(matches, key=lambda item: (len(item.parts), str(item).casefold())):
+    for candidate in sorted(paths, key=lambda item: (len(item.parts), str(item).casefold())):
         if not any(parent in candidate.parents for parent in top_level):
             top_level.append(candidate)
     return top_level
+
+
+def find_output_directories(source_root: Path) -> list[Path]:
+    matches = (
+        path
+        for path in source_root.rglob("*")
+        if path.is_dir()
+        and is_output_directory(path)
+        and not is_inside_history_directory(path, source_root)
+    )
+    return top_level_directories(matches)
+
+
+def find_history_directories(source_root: Path) -> list[Path]:
+    matches = (
+        path
+        for path in source_root.rglob("*")
+        if path.is_dir() and is_history_directory(path)
+    )
+    return top_level_directories(matches)
 
 
 def discover_categories(source_root: Path) -> list[str]:
@@ -224,6 +252,7 @@ def sync_intlibs(
 
     categories = list(categories if categories is not None else discover_categories(source_root))
     output_directories = find_output_directories(source_root)
+    history_directories = find_history_directories(source_root)
     candidates: dict[str, list[IntLibCandidate]] = defaultdict(list)
 
     for output_dir in output_directories:
@@ -319,8 +348,14 @@ def sync_intlibs(
         if not dry_run:
             shutil.rmtree(output_dir)
 
+    for history_dir in sorted(history_directories, key=lambda item: len(item.parts), reverse=True):
+        print(f"{'Would remove' if dry_run else 'Removed'} history directory: {history_dir}")
+        if not dry_run:
+            shutil.rmtree(history_dir)
+
     return SyncResult(
         output_directories=len(output_directories),
+        history_directories=len(history_directories),
         intlibs_found=sum(len(group) for group in candidates.values()),
         intlibs_changed=changed,
         intlibs_unchanged=unchanged,
@@ -469,6 +504,19 @@ def normalize_parameter_name(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", name.casefold())
 
 
+def is_template_component(parameters: Mapping[str, str]) -> bool:
+    """Identify the reusable per-category component template.
+
+    Punctuation and case are intentionally ignored, so the documented
+    ``**TEMPLATE**`` marker remains readable in Altium while matching
+    ``Template`` or ``__template__`` as well.
+    """
+
+    return normalize_parameter_name(parameters.get("Library Reference", "")) == (
+        TEMPLATE_COMPONENT_NAME
+    )
+
+
 def get_parameter(parameters: Mapping[str, str], aliases: Sequence[str]) -> str:
     normalized = {
         normalize_parameter_name(name): value.strip()
@@ -495,6 +543,12 @@ def parse_parameter_blob(
         if not symbol:
             # Footprint records share Parameters.bin but have no Library
             # Reference, so they must not become component catalog rows.
+            continue
+        if is_template_component(parameters):
+            # Every category may contain one reusable **TEMPLATE** component.
+            # It is compiled into the IntLib for convenient copying in Altium,
+            # but is not a real orderable component and must not reach the
+            # generated README catalog or component totals.
             continue
         manufacturer = get_parameter(parameters, aliases["manufacturer"])
         mpn = get_parameter(parameters, aliases["manufacturer_part_number"])
@@ -858,6 +912,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         f"{sync_result.intlibs_found} generated IntLib, "
         f"{sync_result.intlibs_changed} compiled file(s) changed, "
         f"{sync_result.output_directories} output folder(s) removed, "
+        f"{sync_result.history_directories} history folder(s) removed, "
         f"README {'changed' if readme_changed else 'unchanged'}, "
         f"{len(warnings)} warning(s)."
     )
