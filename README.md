@@ -17,18 +17,28 @@ A new numbered GitHub Release is created automatically after every push to `main
 
 After pulling a newer repository revision, reopen or refresh the library in Altium Designer if the updated components are not immediately visible.
 
-## Library Layer Convention <-- NOT VALID;TODO
+## Library Layer Convention
 
-The table below is an example structure only. Replace the layer numbers, names, colors, and descriptions with the actual library convention used in this repository.
+Footprints in this library use the following Altium Designer layer convention. Component documentation is organized as **Component Layer Pairs**, with corresponding top-side and bottom-side mechanical layers. Keep these assignments when creating or editing footprints so all library components use the same fabrication, assembly, courtyard, and 3D conventions.
 
-| Color | Layer number | Layer name | Description |
-|---|---:|---|---|
-| ![Red](https://placehold.co/48x18/E53935/E53935.png) | 1 | Top Copper | Copper objects placed on the top side of the PCB. |
-| ![Blue](https://placehold.co/48x18/1E88E5/1E88E5.png) | 2 | Bottom Copper | Copper objects placed on the bottom side of the PCB. |
-| ![Yellow](https://placehold.co/48x18/FDD835/FDD835.png) | 21 | Top Silkscreen | Top-side component outlines, reference designators, and assembly markings. |
-| ![Cyan](https://placehold.co/48x18/00ACC1/00ACC1.png) | 22 | Bottom Silkscreen | Bottom-side component outlines, reference designators, and assembly markings. |
-| ![Magenta](https://placehold.co/48x18/D81B60/D81B60.png) | 101 | Board Outline | PCB outline and routed-board geometry. |
-| ![Green](https://placehold.co/48x18/43A047/43A047.png) | 102 | Courtyard | Recommended component placement and assembly clearance. |
+| Purpose | Top layer | Bottom layer | Description |
+|---|---|---|---|
+| Copper | `Top Layer` | `Bottom Layer` | Electrical copper features, pads, tracks, and copper regions. |
+| 3D Body | `M13` | `M23` | Component 3D body/model placement and related 3D geometry. |
+| Assembly | `M11` | `M14` | Assembly drawing information, including simplified component body geometry used for assembly documentation. |
+| Component Center | `M10` | `M20` | Component center/origin marker used as a consistent placement reference. |
+| Component Outline | `M12` | `M22` | Detailed physical component body outline. This should represent the actual component envelope rather than the placement courtyard. |
+| Courtyard | `M15` | `M25` | Recommended component placement and assembly clearance boundary. |
+| Overlay | `Top Overlay` | `Bottom Overlay` | Silkscreen graphics, component outlines suitable for printing, polarity/orientation marks, and reference designators. |
+| Paste | `Top Paste` | `Bottom Paste` | Solder-paste stencil openings for SMT pads. |
+| Solder | `Top Solder` | `Bottom Solder` | Solder-mask openings and expansions. |
+| Board Outline | `M1` (`Mechanical 1`) | — | PCB outline and board-level mechanical geometry. Use this layer for board shape information, not component body outlines. |
+| Drill Drawing | `Drill Drawing` | — | Drill-symbol and hole-location documentation generated or used for fabrication drawings. |
+| Drill Guide | `Drill Guide` | — | Drill guide information for plated and non-plated holes. |
+| Keep-Out | `Keep-Out Layer` | — | Routing and placement keep-out geometry where required by the footprint. |
+| Multi-Layer | `Multi-Layer` | — | Objects that apply through the complete PCB stack, primarily through-hole pads and vias. |
+
+When creating a footprint, use the matching top-side layers for normal top-mounted components. Bottom-side layers are their paired equivalents and are used automatically or when defining bottom-side-specific library geometry. Do not repurpose these mechanical layers for unrelated documentation.
 
 ## Adding a New Component
 
