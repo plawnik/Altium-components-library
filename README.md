@@ -19,24 +19,24 @@ After pulling a newer repository revision, reopen or refresh the library in Alti
 
 ## Library Layer Convention
 
-Footprints in this library use the following Altium Designer layer convention. Component documentation is organized as **Component Layer Pairs**, with corresponding top-side and bottom-side mechanical layers. Keep these assignments when creating or editing footprints so all library components use the same fabrication, assembly, courtyard, and 3D conventions.
+Footprints in this library use the following Altium Designer layer convention. Component documentation is organized as **Component Layer Pairs**, with corresponding top-side and bottom-side mechanical layers. Keep these assignments and layer colors when creating or editing footprints so all library components use the same fabrication, assembly, courtyard, and 3D conventions.
 
-| Purpose | Top layer | Bottom layer | Description |
-|---|---|---|---|
-| Copper | `Top Layer` | `Bottom Layer` | Electrical copper features, pads, tracks, and copper regions. |
-| 3D Body | `M13` | `M23` | Component 3D body/model placement and related 3D geometry. |
-| Assembly | `M11` | `M14` | Assembly drawing information, including simplified component body geometry used for assembly documentation. |
-| Component Center | `M10` | `M20` | Component center/origin marker used as a consistent placement reference. |
-| Component Outline | `M12` | `M22` | Detailed physical component body outline. This should represent the actual component envelope rather than the placement courtyard. |
-| Courtyard | `M15` | `M25` | Recommended component placement and assembly clearance boundary. |
-| Overlay | `Top Overlay` | `Bottom Overlay` | Silkscreen graphics, component outlines suitable for printing, polarity/orientation marks, and reference designators. |
-| Paste | `Top Paste` | `Bottom Paste` | Solder-paste stencil openings for SMT pads. |
-| Solder | `Top Solder` | `Bottom Solder` | Solder-mask openings and expansions. |
-| Board Outline | `M1` (`Mechanical 1`) | — | PCB outline and board-level mechanical geometry. Use this layer for board shape information, not component body outlines. |
-| Drill Drawing | `Drill Drawing` | — | Drill-symbol and hole-location documentation generated or used for fabrication drawings. |
-| Drill Guide | `Drill Guide` | — | Drill guide information for plated and non-plated holes. |
-| Keep-Out | `Keep-Out Layer` | — | Routing and placement keep-out geometry where required by the footprint. |
-| Multi-Layer | `Multi-Layer` | — | Objects that apply through the complete PCB stack, primarily through-hole pads and vias. |
+| Purpose | Top color | Top layer | Bottom color | Bottom layer | Description |
+|---|---|---|---|---|---|
+| Copper | ![Red](https://placehold.co/48x18/FF0000/FF0000.png) | `Top Layer` | ![Blue](https://placehold.co/48x18/0000FF/0000FF.png) | `Bottom Layer` | Electrical copper features, pads, tracks, and copper regions. |
+| 3D Body | ![Magenta](https://placehold.co/48x18/FF00FF/FF00FF.png) | `M13` | ![Light Gray](https://placehold.co/48x18/D0D0D0/D0D0D0.png) | `M23` | Component 3D body/model placement and related 3D geometry. |
+| Assembly | ![Dark Green](https://placehold.co/48x18/205018/205018.png) | `M11` | ![Purple](https://placehold.co/48x18/8C008C/8C008C.png) | `M14` | Assembly drawing information, including simplified component body geometry used for assembly documentation. |
+| Component Center | ![Purple](https://placehold.co/48x18/8C008C/8C008C.png) | `M10` | ![Olive](https://placehold.co/48x18/8C8C00/8C8C00.png) | `M20` | Component center/origin marker used as a consistent placement reference. |
+| Component Outline | ![Olive](https://placehold.co/48x18/8C8C00/8C8C00.png) | `M12` | ![Purple](https://placehold.co/48x18/8C008C/8C008C.png) | `M22` | Detailed physical component body outline. This should represent the actual component envelope rather than the placement courtyard. |
+| Courtyard | ![Light Green](https://placehold.co/48x18/93C47D/93C47D.png) | `M15` | ![Magenta](https://placehold.co/48x18/FF00FF/FF00FF.png) | `M25` | Recommended component placement and assembly clearance boundary. |
+| Overlay | ![Yellow](https://placehold.co/48x18/FFFF00/FFFF00.png) | `Top Overlay` | ![Orange](https://placehold.co/48x18/FF9900/FF9900.png) | `Bottom Overlay` | Silkscreen graphics, component outlines suitable for printing, polarity/orientation marks, and reference designators. |
+| Paste | ![Gray](https://placehold.co/48x18/808080/808080.png) | `Top Paste` | ![Dark Red](https://placehold.co/48x18/A00000/A00000.png) | `Bottom Paste` | Solder-paste stencil openings for SMT pads. |
+| Solder | ![Purple](https://placehold.co/48x18/8C008C/8C008C.png) | `Top Solder` | ![Magenta](https://placehold.co/48x18/FF00FF/FF00FF.png) | `Bottom Solder` | Solder-mask openings and expansions. |
+| Board Outline | ![Magenta](https://placehold.co/48x18/FF00FF/FF00FF.png) | `M1` (`Mechanical 1`) | — | — | PCB outline and board-level mechanical geometry. Use this layer for board shape information, not component body outlines. |
+| Drill Drawing | ![Red](https://placehold.co/48x18/FF1828/FF1828.png) | `Drill Drawing` | — | — | Drill-symbol and hole-location documentation generated or used for fabrication drawings. |
+| Drill Guide | ![Dark Red](https://placehold.co/48x18/A00000/A00000.png) | `Drill Guide` | — | — | Drill guide information for plated and non-plated holes. |
+| Keep-Out | ![Magenta](https://placehold.co/48x18/FF00FF/FF00FF.png) | `Keep-Out Layer` | — | — | Routing and placement keep-out geometry where required by the footprint. |
+| Multi-Layer | ![Light Gray](https://placehold.co/48x18/C0C0C0/C0C0C0.png) | `Multi-Layer` | — | — | Objects that apply through the complete PCB stack, primarily through-hole pads and vias. |
 
 When creating a footprint, use the matching top-side layers for normal top-mounted components. Bottom-side layers are their paired equivalents and are used automatically or when defining bottom-side-specific library geometry. Do not repurpose these mechanical layers for unrelated documentation.
 
