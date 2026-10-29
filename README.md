@@ -208,6 +208,7 @@ Write rectangular body dimensions as `W5.1xL10.2xH8.0mm` (width × length × hei
 | `Rows` | Required | Examples: `1`, `2`, `3`, `4`; use `N/A` when rows do not describe the connector correctly. |
 | `Orientation` | Required | Use `Straight` or `Right Angle`. If necessary, add a mechanical qualifier, for example `Straight Vertical` or `Right Angle Horizontal`. |
 | `Mounting Type` | Required | Allowed values: `SMT`, `THT`, or `Other`. Use `Other` for cable, panel, card-edge, or similar connectors. |
+| `Usage` | Required | Connector purpose/type, for example `Pin Header`, `Socket Header`, `USB Type-C`, `USB Type-A`, `FFC/FPC`, `Wire-to-Board`, `Board-to-Board`, `RJ45`, `SMA`, `M.2`, `Terminal Block`, or `DC Power`. |
 | `Manufacturer 1` | Required | Actual manufacturer; `Generic` is not allowed. Examples: `TE Connectivity`, `Molex`, `Hirose`, `JST`. |
 | `Part Number 1` | Required | Exact manufacturer ordering code; `Generic` is not allowed. Example: `1827059-3`. |
 | `Manufacturer 2` | Optional | Approved equivalent manufacturer; otherwise leave empty. |
