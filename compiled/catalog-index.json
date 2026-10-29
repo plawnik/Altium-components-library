@@ -2,6 +2,7 @@
   "version": 1,
   "description": "Generated mapping used to preserve the source category of each flat IntLib file.",
   "libraries": {
+    "CONNECTORS.IntLib": "CONNECTORS",
     "IC.IntLib": "IC",
     "MODULES.IntLib": "MODULES"
   }
